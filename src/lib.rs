@@ -196,6 +196,17 @@ impl Client {
         }
     }
 
+    /// Get current oracle price
+    pub fn get_current_oracle_price(&self) -> Result<u64> {
+        #[derive(Clone, Deserialize, Debug)]
+        struct Response {
+            price: u64,
+        }
+        let response =
+            self.fetch::<Response>("/oracle/prices/current")?;
+        Ok(response.price)
+    }
+
     /// Convert a given transaction to json, ready to be submitted
     /// Submit a transaction to the blockchain
     pub fn submit_txn(&self, txn: &BlockchainTxn) -> Result<PendingTxnStatus> {
