@@ -197,13 +197,13 @@ impl Client {
     }
 
     /// Get current oracle price
+    /// Oracle price is given in $ 10^-8 per HNT
     pub fn get_current_oracle_price(&self) -> Result<u64> {
         #[derive(Clone, Deserialize, Debug)]
         struct Response {
             price: u64,
         }
-        let response =
-            self.fetch::<Response>("/oracle/prices/current")?;
+        let response = self.fetch::<Response>("/oracle/prices/current")?;
         Ok(response.price)
     }
 
