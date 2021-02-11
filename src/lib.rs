@@ -219,7 +219,7 @@ impl Client {
     }
 
     /// Get predicted oracle prices
-    pub fn get_oracle_price_predicted(&self) -> Result<Vec<OraclePredictions>> {
+    pub fn get_oracle_price_predictions(&self) -> Result<Vec<OraclePredictions>> {
         Ok(self.fetch::<Vec<OraclePredictions>>("/oracle/predictions")?)
     }
 
