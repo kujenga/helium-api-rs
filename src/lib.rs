@@ -3,10 +3,15 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 
+#[macro_use]
+pub(crate) mod bones_macro;
+
 mod hnt;
 pub use hnt::Hnt;
 mod hst;
 pub use hst::Hst;
+mod oracle_price;
+pub use oracle_price::OraclePrice;
 
 pub use helium_proto::*;
 use serde::{de::DeserializeOwned, Serialize};
@@ -106,6 +111,13 @@ pub struct Client {
     client: reqwest::Client,
 }
 
+#[derive(Clone, Deserialize, Debug)]
+pub struct OraclePredictions {
+    #[serde(with = "crate::oracle_price::deserializer")]
+    price: OraclePrice,
+    time: usize,
+}
+
 impl Default for Client {
     /// Create a new client using the hosted Helium API at
     /// explorer.helium.foundation
@@ -197,14 +209,31 @@ impl Client {
     }
 
     /// Get current oracle price
-    /// Oracle price is given in $ 10^-8 per HNT
-    pub fn get_current_oracle_price(&self) -> Result<u64> {
+    pub fn get_oracle_price_current(&self) -> Result<OraclePrice> {
         #[derive(Clone, Deserialize, Debug)]
         struct Response {
             price: u64,
         }
         let response = self.fetch::<Response>("/oracle/prices/current")?;
-        Ok(response.price)
+        Ok(OraclePrice::from_bones(response.price))
+    }
+
+    /// Get current oracle price
+    pub fn get_oracle_price_predicted(&self) -> Result<Vec<OraclePredictions>> {
+        //#[derive(Clone, Deserialize, Debug)]
+        // struct Predictions {
+        //     price: u64,
+        //     time: usize,
+        // }
+        let response = self.fetch::<Vec<OraclePredictions>>("/oracle/predictions")?;
+        Ok(response)
+        // let mut ret = Vec::new();
+        //
+        // for prediction in response {
+        //     ret.push(OraclePrice::from_bones(prediction.price))
+        // }
+
+        //Ok(ret)
     }
 
     /// Convert a given transaction to json, ready to be submitted
