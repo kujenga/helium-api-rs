@@ -218,7 +218,7 @@ impl Client {
         Ok(self.fetch::<Response>("/oracle/prices/current")?.price)
     }
 
-    /// Get current oracle price
+    /// Get predicted oracle prices
     pub fn get_oracle_price_predicted(&self) -> Result<Vec<OraclePredictions>> {
         Ok(self.fetch::<Vec<OraclePredictions>>("/oracle/predictions")?)
     }
