@@ -212,28 +212,15 @@ impl Client {
     pub fn get_oracle_price_current(&self) -> Result<OraclePrice> {
         #[derive(Clone, Deserialize, Debug)]
         struct Response {
-            price: u64,
+            #[serde(with = "crate::oracle_price::deserializer")]
+            price: OraclePrice,
         }
-        let response = self.fetch::<Response>("/oracle/prices/current")?;
-        Ok(OraclePrice::from_bones(response.price))
+        Ok(self.fetch::<Response>("/oracle/prices/current")?.price)
     }
 
     /// Get current oracle price
     pub fn get_oracle_price_predicted(&self) -> Result<Vec<OraclePredictions>> {
-        //#[derive(Clone, Deserialize, Debug)]
-        // struct Predictions {
-        //     price: u64,
-        //     time: usize,
-        // }
-        let response = self.fetch::<Vec<OraclePredictions>>("/oracle/predictions")?;
-        Ok(response)
-        // let mut ret = Vec::new();
-        //
-        // for prediction in response {
-        //     ret.push(OraclePrice::from_bones(prediction.price))
-        // }
-
-        //Ok(ret)
+        Ok(self.fetch::<Vec<OraclePredictions>>("/oracle/predictions")?)
     }
 
     /// Convert a given transaction to json, ready to be submitted
